@@ -3,6 +3,8 @@
 import { Check, Sparkles, Zap, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/hooks/use-language';
+import type { TranslationKey } from '@/lib/i18n';
 
 interface PricingSectionProps {
   onUpgrade: () => void;
@@ -13,60 +15,62 @@ interface PricingSectionProps {
 }
 
 export default function PricingSection({ onUpgrade, proEnabled, proPrice, enterprisePrice, freeDailyLimit }: PricingSectionProps) {
+  const { t, isRTL } = useLanguage();
+
   const plans = [
     {
-      name: 'Free',
+      nameKey: 'pricing.free' as TranslationKey,
       icon: <Zap className="h-5 w-5" />,
       price: '$0',
-      period: 'forever',
-      description: 'Perfect for trying out AI tools',
-      features: [
-        `${freeDailyLimit} uses per tool per day`,
-        'All 7 AI tools',
-        'Basic response quality',
-        'Community support',
+      periodKey: 'pricing.free.forever' as TranslationKey,
+      descKey: 'pricing.free.desc' as TranslationKey,
+      featureKeys: [
+        t('pricing.free.feature1', { limit: freeDailyLimit }),
+        t('pricing.free.feature2'),
+        t('pricing.free.feature3'),
+        t('pricing.free.feature4'),
       ],
-      cta: 'Current Plan',
+      ctaKey: 'pricing.free.cta' as TranslationKey,
       highlighted: false,
       color: 'gray',
     },
     {
-      name: 'Pro',
+      nameKey: 'pricing.pro' as TranslationKey,
       icon: <Sparkles className="h-5 w-5" />,
       price: `$${proPrice}`,
-      period: '/month',
-      description: 'Unlimited power for professionals',
-      features: [
-        'Unlimited uses',
-        'All 7 AI tools',
-        'Priority response quality',
-        'Faster processing',
-        'Advanced image sizes',
-        'Priority support',
-        'API access',
+      periodKey: 'pricing.pro.perMonth' as TranslationKey,
+      descKey: 'pricing.pro.desc' as TranslationKey,
+      featureKeys: [
+        t('pricing.pro.feature1'),
+        t('pricing.pro.feature2'),
+        t('pricing.pro.feature3'),
+        t('pricing.pro.feature4'),
+        t('pricing.pro.feature5'),
+        t('pricing.pro.feature6'),
+        t('pricing.pro.feature7'),
       ],
-      cta: 'Upgrade to Pro',
+      ctaKey: 'pricing.pro.cta' as TranslationKey,
       highlighted: true,
       color: 'emerald',
       enabled: proEnabled,
     },
     {
-      name: 'Enterprise',
+      nameKey: 'pricing.enterprise' as TranslationKey,
       icon: <Building2 className="h-5 w-5" />,
       price: `$${enterprisePrice}`,
-      period: '/month',
-      description: 'For teams and organizations',
-      features: [
-        'Everything in Pro',
-        'Team collaboration',
-        'Custom AI models',
-        'Dedicated support',
-        'SLA guarantee',
-        'Custom integrations',
-        'Analytics dashboard',
-        'Admin controls',
+      periodKey: 'pricing.enterprise.perMonth' as TranslationKey,
+      descKey: 'pricing.enterprise.desc' as TranslationKey,
+      featureKeys: [
+        t('pricing.enterprise.feature1'),
+        t('pricing.enterprise.feature2'),
+        t('pricing.enterprise.feature3'),
+        t('pricing.enterprise.feature4'),
+        t('pricing.enterprise.feature5'),
+        t('pricing.enterprise.feature6'),
+        t('pricing.enterprise.feature7'),
+        t('pricing.enterprise.feature8'),
       ],
-      cta: 'Contact Sales',
+      ctaKey: 'pricing.enterprise.cta' as TranslationKey,
       highlighted: false,
       color: 'gray',
     },
@@ -83,17 +87,17 @@ export default function PricingSection({ onUpgrade, proEnabled, proPrice, enterp
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-4">
-            Simple, Transparent Pricing
+            {t('pricing.title')}
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Start free with {freeDailyLimit} daily uses per tool. Upgrade to Pro for unlimited access and priority processing.
+            {t('pricing.subtitle', { limit: freeDailyLimit })}
           </p>
         </motion.div>
 
         <div className={`grid gap-6 lg:gap-8 ${proEnabled ? 'md:grid-cols-3' : 'md:grid-cols-2 max-w-3xl mx-auto'}`}>
-          {plans.filter(p => p.name !== 'Pro' || proEnabled).map((plan, index) => (
+          {plans.filter(p => t(p.nameKey) !== t('pricing.pro') || proEnabled).map((plan, index) => (
             <motion.div
-              key={plan.name}
+              key={t(plan.nameKey)}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -105,25 +109,25 @@ export default function PricingSection({ onUpgrade, proEnabled, proPrice, enterp
               }`}
             >
               {plan.highlighted && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold">
-                  MOST POPULAR
+                <div className={`absolute -top-4 ${isRTL ? 'right-1/2 translate-x-1/2' : 'left-1/2 -translate-x-1/2'} px-4 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold`}>
+                  {t('pricing.pro.popular')}
                 </div>
               )}
 
               <div className="flex items-center gap-2 mb-4">
                 <span className={plan.highlighted ? 'text-emerald-400' : 'text-gray-400'}>{plan.icon}</span>
-                <h3 className="text-xl font-bold text-gray-100">{plan.name}</h3>
+                <h3 className="text-xl font-bold text-gray-100">{t(plan.nameKey)}</h3>
               </div>
 
               <div className="mb-2">
                 <span className="text-4xl font-bold text-gray-100">{plan.price}</span>
-                <span className="text-gray-500 ml-1">{plan.period}</span>
+                <span className={`text-gray-500 ${isRTL ? 'mr-1' : 'ml-1'}`}>{t(plan.periodKey)}</span>
               </div>
 
-              <p className="text-gray-400 text-sm mb-6">{plan.description}</p>
+              <p className="text-gray-400 text-sm mb-6">{t(plan.descKey)}</p>
 
               <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
+                {plan.featureKeys.map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
                     <Check className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.highlighted ? 'text-emerald-400' : 'text-gray-500'}`} />
                     <span className="text-sm text-gray-300">{feature}</span>
@@ -139,7 +143,7 @@ export default function PricingSection({ onUpgrade, proEnabled, proPrice, enterp
                     : 'bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700'
                 }`}
               >
-                {plan.cta}
+                {t(plan.ctaKey)}
               </Button>
             </motion.div>
           ))}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
@@ -20,6 +20,8 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, Crown, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSettings } from '@/hooks/use-settings';
+import { useLanguage } from '@/hooks/use-language';
+import type { TranslationKey } from '@/lib/i18n';
 
 const toolComponents: Record<string, React.ReactNode> = {
   chat: <ChatTool />,
@@ -31,12 +33,31 @@ const toolComponents: Record<string, React.ReactNode> = {
   shorten: <URLShortenerTool />,
 };
 
+const toolGrid = [
+  { id: 'chat', icon: '💬', titleKey: 'tools.chat.title' as TranslationKey, descKey: 'tools.chat.desc' as TranslationKey },
+  { id: 'image', icon: '🎨', titleKey: 'tools.image.title' as TranslationKey, descKey: 'tools.image.desc' as TranslationKey },
+  { id: 'summarize', icon: '📝', titleKey: 'tools.summarize.title' as TranslationKey, descKey: 'tools.summarize.desc' as TranslationKey },
+  { id: 'rewrite', icon: '✍️', titleKey: 'tools.rewrite.title' as TranslationKey, descKey: 'tools.rewrite.desc' as TranslationKey },
+  { id: 'translate', icon: '🌐', titleKey: 'tools.translate.title' as TranslationKey, descKey: 'tools.translate.desc' as TranslationKey },
+  { id: 'qrcode', icon: '📱', titleKey: 'tools.qrcode.title' as TranslationKey, descKey: 'tools.qrcode.desc' as TranslationKey },
+  { id: 'shorten', icon: '🔗', titleKey: 'tools.shorten.title' as TranslationKey, descKey: 'tools.shorten.desc' as TranslationKey },
+];
+
+const upgradeFeatureKeys: TranslationKey[] = [
+  'upgrade.feature1',
+  'upgrade.feature2',
+  'upgrade.feature3',
+  'upgrade.feature4',
+  'upgrade.feature5',
+];
+
 export default function Home() {
   const [activeTool, setActiveTool] = useState('');
   const [showPricingDialog, setShowPricingDialog] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const pricingRef = useRef<HTMLDivElement>(null);
   const { settings, loading } = useSettings();
+  const { t, isRTL } = useLanguage();
 
   const handleToolChange = (tool: string) => {
     if (tool === 'admin') {
@@ -66,7 +87,7 @@ export default function Home() {
 
   const handleUpgrade = () => {
     if (!settings.proEnabled) {
-      toast.info('Pro plan is currently unavailable.');
+      toast.info(t('upgrade.unavailable'));
       return;
     }
     setShowPricingDialog(true);
@@ -84,14 +105,14 @@ export default function Home() {
           <div className="mx-auto w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center mb-6">
             <AlertTriangle className="h-10 w-10 text-amber-400" />
           </div>
-          <h1 className="text-3xl font-bold mb-3">Under Maintenance</h1>
-          <p className="text-gray-400 mb-6">We are currently performing maintenance on {settings.siteName}. Please check back soon.</p>
+          <h1 className="text-3xl font-bold mb-3">{t('maintenance.title')}</h1>
+          <p className="text-gray-400 mb-6">{t('maintenance.desc', { name: settings.siteName })}</p>
           <Button
             onClick={() => window.location.reload()}
             variant="outline"
             className="border-gray-700 text-gray-300 hover:bg-gray-800"
           >
-            Refresh Page
+            {t('maintenance.refresh')}
           </Button>
         </motion.div>
       </div>
@@ -146,28 +167,20 @@ export default function Home() {
                       exit={{ opacity: 0 }}
                       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                     >
-                      {[
-                        { id: 'chat', icon: '💬', title: 'AI Chat', desc: 'Conversational AI assistant' },
-                        { id: 'image', icon: '🎨', title: 'Image Generator', desc: 'Create images from text prompts' },
-                        { id: 'summarize', icon: '📝', title: 'Summarizer', desc: 'Condense long text into key points' },
-                        { id: 'rewrite', icon: '✍️', title: 'Text Rewriter', desc: 'Rewrite in different styles' },
-                        { id: 'translate', icon: '🌐', title: 'Translator', desc: 'Translate between 15+ languages' },
-                        { id: 'qrcode', icon: '📱', title: 'QR Code', desc: 'Generate QR codes instantly' },
-                        { id: 'shorten', icon: '🔗', title: 'URL Shortener', desc: 'Shorten URLs with analytics' },
-                      ].map((tool, index) => (
+                      {toolGrid.map((tool, index) => (
                         <motion.button
                           key={tool.id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.08 }}
                           onClick={() => handleToolChange(tool.id)}
-                          className="group p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/30 hover:bg-gray-800/80 text-left transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5"
+                          className={`group p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/30 hover:bg-gray-800/80 ${isRTL ? 'text-right' : 'text-left'} transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5`}
                         >
-                          <div className="text-3xl mb-3">{tool.icon}</div>
+                          <div className={`text-3xl mb-3`}>{tool.icon}</div>
                           <h3 className="text-lg font-semibold text-gray-100 group-hover:text-emerald-400 transition-colors">
-                            {tool.title}
+                            {t(tool.titleKey)}
                           </h3>
-                          <p className="text-sm text-gray-500 mt-1">{tool.desc}</p>
+                          <p className="text-sm text-gray-500 mt-1">{t(tool.descKey)}</p>
                         </motion.button>
                       ))}
                     </motion.div>
@@ -202,33 +215,33 @@ export default function Home() {
             <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center mb-4">
               <Crown className="h-8 w-8 text-white" />
             </div>
-            <DialogTitle className="text-center text-xl">Upgrade to Pro</DialogTitle>
+            <DialogTitle className="text-center text-xl">{t('upgrade.title')}</DialogTitle>
             <DialogDescription className="text-center text-gray-400">
-              Get unlimited access to all AI tools with priority processing.
+              {t('upgrade.desc')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="bg-gray-800 rounded-xl p-4 space-y-2">
-              {['Unlimited uses for all tools', 'Priority processing speed', 'Advanced image sizes', 'API access', 'Priority support'].map((feature) => (
-                <div key={feature} className="flex items-center gap-2 text-sm text-gray-300">
-                  <Sparkles className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
-                  {feature}
+              {upgradeFeatureKeys.map((key) => (
+                <div key={key} className="flex items-center gap-2 text-sm text-gray-300">
+                  <Sparkles className={`h-3.5 w-3.5 text-emerald-400 flex-shrink-0 ${isRTL ? 'ml-0' : 'mr-0'}`} />
+                  {t(key)}
                 </div>
               ))}
             </div>
             <div className="text-center">
               <span className="text-3xl font-bold text-gray-100">${settings.proPrice}</span>
-              <span className="text-gray-500">/month</span>
+              <span className="text-gray-500">{t('upgrade.perMonth')}</span>
             </div>
             <Button
               className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-6"
               onClick={() => {
-                toast.success('Thank you for your interest! Payment integration coming soon.');
+                toast.success(t('upgrade.thanks'));
                 setShowPricingDialog(false);
               }}
             >
-              <Sparkles className="mr-2 h-4 w-4" />
-              Upgrade Now
+              <Sparkles className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4`} />
+              {t('upgrade.cta')}
             </Button>
           </div>
         </DialogContent>

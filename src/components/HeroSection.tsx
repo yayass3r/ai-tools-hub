@@ -1,8 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, Zap, ArrowRight } from 'lucide-react';
+import { Sparkles, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/use-language';
+import { useSettings } from '@/hooks/use-settings';
 
 interface HeroSectionProps {
   onGetStarted: () => void;
@@ -10,6 +12,9 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onGetStarted, onViewPricing }: HeroSectionProps) {
+  const { t, isRTL } = useLanguage();
+  const { settings } = useSettings();
+
   return (
     <section className="relative overflow-hidden">
       {/* Background gradient */}
@@ -35,21 +40,21 @@ export default function HeroSection({ onGetStarted, onViewPricing }: HeroSection
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8"
           >
             <Sparkles className="h-4 w-4" />
-            7 AI-Powered Tools — All in One Place
+            {t('hero.badge')}
           </motion.div>
 
           {/* Heading */}
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-6">
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
-              AI-Powered Tools
+            <span className="gradient-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
+              {t('hero.title1')}
             </span>
             <br />
-            <span className="text-gray-100">at Your Fingertips</span>
+            <span className="text-gray-100">{t('hero.title2')}</span>
           </h1>
 
           {/* Subtitle */}
           <p className="max-w-2xl mx-auto text-lg sm:text-xl text-gray-400 mb-10">
-            Chat, generate images, summarize, rewrite, translate, create QR codes, and shorten URLs — all powered by cutting-edge AI. Start free, upgrade when you need more.
+            {t('hero.subtitle')}
           </p>
 
           {/* CTA Buttons */}
@@ -59,8 +64,8 @@ export default function HeroSection({ onGetStarted, onViewPricing }: HeroSection
               onClick={onGetStarted}
               className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold px-8 py-6 text-lg rounded-xl shadow-lg shadow-emerald-500/20"
             >
-              <Zap className="mr-2 h-5 w-5" />
-              Get Started Free
+              <Zap className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t('hero.getStarted')}
             </Button>
             <Button
               size="lg"
@@ -68,8 +73,8 @@ export default function HeroSection({ onGetStarted, onViewPricing }: HeroSection
               onClick={onViewPricing}
               className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-gray-100 px-8 py-6 text-lg rounded-xl"
             >
-              View Pricing
-              <ArrowRight className="ml-2 h-5 w-5" />
+              {t('hero.viewPricing')}
+              {isRTL ? <ArrowLeft className="mr-2 h-5 w-5" /> : <ArrowRight className="ml-2 h-5 w-5" />}
             </Button>
           </div>
 
@@ -82,15 +87,15 @@ export default function HeroSection({ onGetStarted, onViewPricing }: HeroSection
           >
             <div>
               <div className="text-2xl sm:text-3xl font-bold text-emerald-400">7</div>
-              <div className="text-sm text-gray-500">AI Tools</div>
+              <div className="text-sm text-gray-500">{t('hero.aiTools')}</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-bold text-teal-400">5/day</div>
-              <div className="text-sm text-gray-500">Free Uses</div>
+              <div className="text-2xl sm:text-3xl font-bold text-teal-400">{settings.freeDailyLimit}/day</div>
+              <div className="text-sm text-gray-500">{t('hero.freeUses')}</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-bold text-emerald-400">$9.99</div>
-              <div className="text-sm text-gray-500">Pro/month</div>
+              <div className="text-2xl sm:text-3xl font-bold text-emerald-400">${settings.proPrice}</div>
+              <div className="text-sm text-gray-500">{t('hero.proMonth')}</div>
             </div>
           </motion.div>
         </motion.div>

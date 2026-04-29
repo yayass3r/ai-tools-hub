@@ -1,8 +1,37 @@
 'use client';
 
 import { Sparkles, Github, Twitter, Mail } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
+import type { TranslationKey } from '@/lib/i18n';
 
 export default function Footer() {
+  const { t } = useLanguage();
+
+  const toolLabels: TranslationKey[] = [
+    'tools.chat.title',
+    'tools.image.title',
+    'tools.summarize.title',
+    'tools.rewrite.title',
+    'tools.translate.title',
+    'tools.qrcode.title',
+    'tools.shorten.title',
+  ];
+
+  const companyLabels: TranslationKey[] = [
+    'footer.about',
+    'footer.blog',
+    'footer.careers',
+    'footer.press',
+    'footer.partners',
+  ];
+
+  const legalLabels: TranslationKey[] = [
+    'footer.privacy',
+    'footer.terms',
+    'footer.cookies',
+    'footer.gdpr',
+  ];
+
   return (
     <footer className="border-t border-gray-800 bg-gray-950 mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
@@ -16,18 +45,18 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-gray-500">
-              Powerful AI tools for everyone. Chat, create, translate, and more — all in one platform.
+              {t('footer.desc')}
             </p>
           </div>
 
           {/* Tools */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-300 mb-4">Tools</h4>
+            <h4 className="text-sm font-semibold text-gray-300 mb-4">{t('footer.tools')}</h4>
             <ul className="space-y-2">
-              {['AI Chat', 'Image Generator', 'Summarizer', 'Text Rewriter', 'Translator', 'QR Code', 'URL Shortener'].map((tool) => (
-                <li key={tool}>
+              {toolLabels.map((key) => (
+                <li key={key}>
                   <span className="text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer">
-                    {tool}
+                    {t(key)}
                   </span>
                 </li>
               ))}
@@ -36,12 +65,12 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-300 mb-4">Company</h4>
+            <h4 className="text-sm font-semibold text-gray-300 mb-4">{t('footer.company')}</h4>
             <ul className="space-y-2">
-              {['About', 'Blog', 'Careers', 'Press', 'Partners'].map((item) => (
-                <li key={item}>
+              {companyLabels.map((key) => (
+                <li key={key}>
                   <span className="text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer">
-                    {item}
+                    {t(key)}
                   </span>
                 </li>
               ))}
@@ -50,12 +79,12 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-300 mb-4">Legal</h4>
+            <h4 className="text-sm font-semibold text-gray-300 mb-4">{t('footer.legal')}</h4>
             <ul className="space-y-2">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR'].map((item) => (
-                <li key={item}>
+              {legalLabels.map((key) => (
+                <li key={key}>
                   <span className="text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer">
-                    {item}
+                    {t(key)}
                   </span>
                 </li>
               ))}
@@ -65,7 +94,7 @@ export default function Footer() {
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} AI Tools Hub. All rights reserved.
+            © {new Date().getFullYear()} AI Tools Hub. {t('footer.rights')}
           </p>
           <div className="flex items-center gap-4">
             <span className="text-gray-500 hover:text-gray-300 transition-colors cursor-pointer">

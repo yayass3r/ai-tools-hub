@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Settings, DollarSign, Eye, EyeOff, Save,
+  Settings, DollarSign, Eye, Save,
   Shield, Megaphone, Palette, Server, Users, BarChart3,
   Check, X, AlertTriangle, Loader2
 } from 'lucide-react';
@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { useLanguage } from '@/hooks/use-language';
 
 interface AdminSettings {
   id?: string;
@@ -75,6 +76,7 @@ export default function AdminDashboard() {
   const [adminPassword, setAdminPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const ADMIN_PASSWORD = 'admin2026';
+  const { t, isRTL } = useLanguage();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -90,7 +92,7 @@ export default function AdminDashboard() {
         setSettings({ ...defaultAdminSettings, ...data });
       }
     } catch {
-      toast.error('Failed to load settings');
+      toast.error(t('admin.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -107,12 +109,12 @@ export default function AdminDashboard() {
       if (res.ok) {
         const data = await res.json();
         setSettings({ ...defaultAdminSettings, ...data });
-        toast.success('Settings saved successfully!');
+        toast.success(t('admin.saved'));
       } else {
-        toast.error('Failed to save settings');
+        toast.error(t('admin.saveFailed'));
       }
     } catch {
-      toast.error('Failed to save settings');
+      toast.error(t('admin.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -136,13 +138,13 @@ export default function AdminDashboard() {
               <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center mb-3">
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <CardTitle className="text-gray-100">Admin Access</CardTitle>
-              <CardDescription className="text-gray-400">Enter admin password to continue</CardDescription>
+              <CardTitle className="text-gray-100">{t('admin.access')}</CardTitle>
+              <CardDescription className="text-gray-400">{t('admin.enterPassword')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-gray-300">Password</Label>
+                  <Label className="text-gray-300">{t('admin.password')}</Label>
                   <Input
                     type="password"
                     value={adminPassword}
@@ -152,7 +154,7 @@ export default function AdminDashboard() {
                         setIsAuthenticated(true);
                       }
                     }}
-                    placeholder="Enter admin password"
+                    placeholder={t('admin.passwordPlaceholder')}
                     className="bg-gray-800 border-gray-700 text-gray-100 mt-1.5"
                   />
                 </div>
@@ -161,12 +163,12 @@ export default function AdminDashboard() {
                     if (adminPassword === ADMIN_PASSWORD) {
                       setIsAuthenticated(true);
                     } else {
-                      toast.error('Invalid password');
+                      toast.error(t('admin.invalidPassword'));
                     }
                   }}
                   className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
                 >
-                  Login to Dashboard
+                  {t('admin.login')}
                 </Button>
               </div>
             </CardContent>
@@ -191,17 +193,17 @@ export default function AdminDashboard() {
         <div>
           <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
             <Settings className="h-6 w-6 text-emerald-400" />
-            Admin Dashboard
+            {t('admin.dashboard')}
           </h2>
-          <p className="text-gray-400 text-sm mt-1">Manage your AI Tools Hub platform</p>
+          <p className="text-gray-400 text-sm mt-1">{t('admin.manage')}</p>
         </div>
         <Button
           onClick={saveSettings}
           disabled={saving}
           className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
         >
-          {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-          {saving ? 'Saving...' : 'Save All Changes'}
+          {saving ? <Loader2 className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4 animate-spin`} /> : <Save className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4`} />}
+          {saving ? t('admin.saving') : t('admin.save')}
         </Button>
       </div>
 
@@ -209,16 +211,16 @@ export default function AdminDashboard() {
       <Tabs defaultValue="general" className="space-y-6">
         <TabsList className="bg-gray-900 border border-gray-800">
           <TabsTrigger value="general" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-400">
-            <Server className="h-4 w-4 mr-1.5" />General
+            <Server className={`h-4 w-4 ${isRTL ? 'ml-1.5' : 'mr-1.5'}`} />{t('admin.general')}
           </TabsTrigger>
           <TabsTrigger value="pricing" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-400">
-            <DollarSign className="h-4 w-4 mr-1.5" />Pricing
+            <DollarSign className={`h-4 w-4 ${isRTL ? 'ml-1.5' : 'mr-1.5'}`} />{t('admin.pricing')}
           </TabsTrigger>
           <TabsTrigger value="ads" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-400">
-            <Megaphone className="h-4 w-4 mr-1.5" />Ads
+            <Megaphone className={`h-4 w-4 ${isRTL ? 'ml-1.5' : 'mr-1.5'}`} />{t('admin.ads')}
           </TabsTrigger>
           <TabsTrigger value="mobile-ads" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-400">
-            <Palette className="h-4 w-4 mr-1.5" />Mobile Ads
+            <Palette className={`h-4 w-4 ${isRTL ? 'ml-1.5' : 'mr-1.5'}`} />{t('admin.mobileAds')}
           </TabsTrigger>
         </TabsList>
 
@@ -228,13 +230,13 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <Server className="h-5 w-5 text-emerald-400" />Site Settings
+                  <Server className="h-5 w-5 text-emerald-400" />{t('admin.siteSettings')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Basic site configuration</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.siteConfig')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-gray-300">Site Name</Label>
+                  <Label className="text-gray-300">{t('admin.siteName')}</Label>
                   <Input
                     value={settings.siteName}
                     onChange={(e) => updateSetting('siteName', e.target.value)}
@@ -242,7 +244,7 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-300">Site Description</Label>
+                  <Label className="text-gray-300">{t('admin.siteDescription')}</Label>
                   <Input
                     value={settings.siteDescription}
                     onChange={(e) => updateSetting('siteDescription', e.target.value)}
@@ -252,8 +254,8 @@ export default function AdminDashboard() {
                 <Separator className="bg-gray-800" />
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-gray-300">Maintenance Mode</Label>
-                    <p className="text-xs text-gray-500 mt-0.5">Show maintenance page to visitors</p>
+                    <Label className="text-gray-300">{t('admin.maintenanceMode')}</Label>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('admin.maintenanceDesc')}</p>
                   </div>
                   <Switch
                     checked={settings.maintenanceMode}
@@ -266,13 +268,13 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <Users className="h-5 w-5 text-emerald-400" />Free Tier
+                  <Users className="h-5 w-5 text-emerald-400" />{t('admin.freeTier')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Configure free user limits</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.freeTierConfig')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-gray-300">Daily Free Limit (per tool)</Label>
+                  <Label className="text-gray-300">{t('admin.dailyFreeLimit')}</Label>
                   <Input
                     type="number"
                     min={1}
@@ -281,11 +283,11 @@ export default function AdminDashboard() {
                     onChange={(e) => updateSetting('freeDailyLimit', parseInt(e.target.value) || 5)}
                     className="bg-gray-800 border-gray-700 text-gray-100 mt-1.5"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Number of free uses per tool per day</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('admin.freeLimitHint')}</p>
                 </div>
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-amber-300">Lower limits encourage more upgrades. Recommended: 3-5 per day.</p>
+                  <p className="text-xs text-amber-300">{t('admin.freeLimitTip')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -298,15 +300,15 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-emerald-400" />Pro Plan
+                  <DollarSign className="h-5 w-5 text-emerald-400" />{t('admin.proPlan')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Configure Pro subscription</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.proConfig')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-gray-300">Enable Pro Plan</Label>
-                    <p className="text-xs text-gray-500 mt-0.5">Show Pro upgrade option</p>
+                    <Label className="text-gray-300">{t('admin.enablePro')}</Label>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('admin.enableProDesc')}</p>
                   </div>
                   <Switch
                     checked={settings.proEnabled}
@@ -315,16 +317,16 @@ export default function AdminDashboard() {
                 </div>
                 <Separator className="bg-gray-800" />
                 <div>
-                  <Label className="text-gray-300">Pro Price (USD/month)</Label>
+                  <Label className="text-gray-300">{t('admin.proPrice')}</Label>
                   <div className="relative mt-1.5">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                    <span className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-400`}>$</span>
                     <Input
                       type="number"
                       step="0.01"
                       min="0.01"
                       value={settings.proPrice}
                       onChange={(e) => updateSetting('proPrice', e.target.value)}
-                      className="bg-gray-800 border-gray-700 text-gray-100 pl-7"
+                      className={`bg-gray-800 border-gray-700 text-gray-100 ${isRTL ? 'pr-7' : 'pl-7'}`}
                     />
                   </div>
                 </div>
@@ -335,7 +337,7 @@ export default function AdminDashboard() {
                     <X className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
                   )}
                   <p className={`text-xs ${settings.proEnabled ? 'text-emerald-300' : 'text-red-300'}`}>
-                    {settings.proEnabled ? 'Pro plan is active and visible to users.' : 'Pro plan is disabled. Users will only see the free tier.'}
+                    {settings.proEnabled ? t('admin.proActive') : t('admin.proDisabled')}
                   </p>
                 </div>
               </CardContent>
@@ -344,27 +346,27 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-emerald-400" />Enterprise Plan
+                  <BarChart3 className="h-5 w-5 text-emerald-400" />{t('admin.enterprisePlan')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Configure Enterprise plan pricing</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.enterpriseConfig')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-gray-300">Enterprise Price (USD/month)</Label>
+                  <Label className="text-gray-300">{t('admin.enterprisePrice')}</Label>
                   <div className="relative mt-1.5">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                    <span className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-400`}>$</span>
                     <Input
                       type="number"
                       step="0.01"
                       min="0.01"
                       value={settings.enterprisePrice}
                       onChange={(e) => updateSetting('enterprisePrice', e.target.value)}
-                      className="bg-gray-800 border-gray-700 text-gray-100 pl-7"
+                      className={`bg-gray-800 border-gray-700 text-gray-100 ${isRTL ? 'pr-7' : 'pl-7'}`}
                     />
                   </div>
                 </div>
                 <div className="bg-gray-800 rounded-lg p-3">
-                  <p className="text-xs text-gray-400">Enterprise plan is always visible when Pro is enabled. It includes team features, custom models, and SLA guarantees.</p>
+                  <p className="text-xs text-gray-400">{t('admin.enterpriseNote')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -373,25 +375,25 @@ export default function AdminDashboard() {
           {/* Live Preview */}
           <Card className="bg-gray-900 border-gray-800">
             <CardHeader>
-              <CardTitle className="text-gray-100">Price Preview</CardTitle>
-              <CardDescription className="text-gray-400">How pricing appears to users</CardDescription>
+              <CardTitle className="text-gray-100">{t('admin.pricePreview')}</CardTitle>
+              <CardDescription className="text-gray-400">{t('admin.priceAppear')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
                 <div className="rounded-xl p-4 bg-gray-800 border border-gray-700 text-center">
-                  <p className="text-sm text-gray-400">Free</p>
+                  <p className="text-sm text-gray-400">{t('pricing.free')}</p>
                   <p className="text-2xl font-bold text-gray-100">$0</p>
-                  <p className="text-xs text-gray-500">{settings.freeDailyLimit} uses/day</p>
+                  <p className="text-xs text-gray-500">{settings.freeDailyLimit} {t('admin.usesPerDay')}</p>
                 </div>
                 <div className={`rounded-xl p-4 text-center ${settings.proEnabled ? 'bg-emerald-500/10 border-2 border-emerald-500/30' : 'bg-gray-800 border border-gray-700 opacity-50'}`}>
-                  <p className="text-sm text-gray-400">Pro</p>
+                  <p className="text-sm text-gray-400">{t('pricing.pro')}</p>
                   <p className="text-2xl font-bold text-gray-100">${settings.proPrice}</p>
-                  <p className="text-xs text-gray-500">/month</p>
+                  <p className="text-xs text-gray-500">{t('pricing.pro.perMonth')}</p>
                 </div>
                 <div className="rounded-xl p-4 bg-gray-800 border border-gray-700 text-center">
-                  <p className="text-sm text-gray-400">Enterprise</p>
+                  <p className="text-sm text-gray-400">{t('pricing.enterprise')}</p>
                   <p className="text-2xl font-bold text-gray-100">${settings.enterprisePrice}</p>
-                  <p className="text-xs text-gray-500">/month</p>
+                  <p className="text-xs text-gray-500">{t('pricing.enterprise.perMonth')}</p>
                 </div>
               </div>
             </CardContent>
@@ -405,15 +407,15 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <Megaphone className="h-5 w-5 text-yellow-400" />Google AdSense
+                  <Megaphone className="h-5 w-5 text-yellow-400" />{t('admin.googleAdsense')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Google display advertising</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.adsenseDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-gray-300">Enable AdSense</Label>
-                    <p className="text-xs text-gray-500 mt-0.5">Show Google ads on your site</p>
+                    <Label className="text-gray-300">{t('admin.enableAdsense')}</Label>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('admin.enableAdsenseDesc')}</p>
                   </div>
                   <Switch
                     checked={settings.adsenseEnabled}
@@ -422,7 +424,7 @@ export default function AdminDashboard() {
                 </div>
                 <Separator className="bg-gray-800" />
                 <div>
-                  <Label className="text-gray-300">AdSense Client ID</Label>
+                  <Label className="text-gray-300">{t('admin.adsenseClientId')}</Label>
                   <Input
                     value={settings.adsenseClientId}
                     onChange={(e) => updateSetting('adsenseClientId', e.target.value)}
@@ -432,7 +434,7 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-300">Ad Slot ID</Label>
+                  <Label className="text-gray-300">{t('admin.adsSlotId')}</Label>
                   <Input
                     value={settings.adsenseSlotId}
                     onChange={(e) => updateSetting('adsenseSlotId', e.target.value)}
@@ -440,12 +442,12 @@ export default function AdminDashboard() {
                     className="bg-gray-800 border-gray-700 text-gray-100 mt-1.5"
                     disabled={!settings.adsenseEnabled}
                   />
-                  <p className="text-xs text-gray-500 mt-1">Leave empty for auto ads</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('admin.adsAutoHint')}</p>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-gray-300">Auto Ads</Label>
-                    <p className="text-xs text-gray-500 mt-0.5">Let Google place ads automatically</p>
+                    <Label className="text-gray-300">{t('admin.autoAds')}</Label>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('admin.autoAdsDesc')}</p>
                   </div>
                   <Switch
                     checked={settings.adsenseAutoAds}
@@ -460,15 +462,15 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <Megaphone className="h-5 w-5 text-blue-400" />Media.net
+                  <Megaphone className="h-5 w-5 text-blue-400" />{t('admin.mediaNet')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Yahoo! Bing contextual ads</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.mediaNetDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-gray-300">Enable Media.net</Label>
-                    <p className="text-xs text-gray-500 mt-0.5">Show Yahoo/Bing ads</p>
+                    <Label className="text-gray-300">{t('admin.enableMediaNet')}</Label>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('admin.enableMediaNetDesc')}</p>
                   </div>
                   <Switch
                     checked={settings.mediaNetEnabled}
@@ -477,7 +479,7 @@ export default function AdminDashboard() {
                 </div>
                 <Separator className="bg-gray-800" />
                 <div>
-                  <Label className="text-gray-300">CID</Label>
+                  <Label className="text-gray-300">{t('admin.cid')}</Label>
                   <Input
                     value={settings.mediaNetCid}
                     onChange={(e) => updateSetting('mediaNetCid', e.target.value)}
@@ -487,7 +489,7 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div>
-                  <Label className="text-gray-300">CRID</Label>
+                  <Label className="text-gray-300">{t('admin.crid')}</Label>
                   <Input
                     value={settings.mediaNetCrid}
                     onChange={(e) => updateSetting('mediaNetCrid', e.target.value)}
@@ -503,15 +505,15 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <Megaphone className="h-5 w-5 text-purple-400" />Propeller Ads
+                  <Megaphone className="h-5 w-5 text-purple-400" />{t('admin.propellerAds')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Pop-under and display ads</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.propellerDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-gray-300">Enable Propeller Ads</Label>
-                    <p className="text-xs text-gray-500 mt-0.5">Show Propeller ads</p>
+                    <Label className="text-gray-300">{t('admin.enablePropeller')}</Label>
+                    <p className="text-xs text-gray-500 mt-0.5">{t('admin.enablePropellerDesc')}</p>
                   </div>
                   <Switch
                     checked={settings.propellerEnabled}
@@ -520,7 +522,7 @@ export default function AdminDashboard() {
                 </div>
                 <Separator className="bg-gray-800" />
                 <div>
-                  <Label className="text-gray-300">Zone ID</Label>
+                  <Label className="text-gray-300">{t('admin.zoneId')}</Label>
                   <Input
                     value={settings.propellerZoneId}
                     onChange={(e) => updateSetting('propellerZoneId', e.target.value)}
@@ -536,26 +538,26 @@ export default function AdminDashboard() {
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-gray-100 flex items-center gap-2">
-                  <Eye className="h-5 w-5 text-emerald-400" />Ad Placement
+                  <Eye className="h-5 w-5 text-emerald-400" />{t('admin.adPlacement')}
                 </CardTitle>
-                <CardDescription className="text-gray-400">Control where and how often ads appear</CardDescription>
+                <CardDescription className="text-gray-400">{t('admin.adPlacementDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-gray-300">Ad Position</Label>
+                  <Label className="text-gray-300">{t('admin.adPosition')}</Label>
                   <Select value={settings.adPosition} onValueChange={(value) => updateSetting('adPosition', value)}>
                     <SelectTrigger className="bg-gray-800 border-gray-700 text-gray-100 mt-1.5">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-700">
-                      <SelectItem value="top">Top Only</SelectItem>
-                      <SelectItem value="bottom">Bottom Only</SelectItem>
-                      <SelectItem value="both">Both Top & Bottom</SelectItem>
+                      <SelectItem value="top">{t('admin.topOnly')}</SelectItem>
+                      <SelectItem value="bottom">{t('admin.bottomOnly')}</SelectItem>
+                      <SelectItem value="both">{t('admin.bothTopBottom')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-gray-300">Ad Frequency</Label>
+                  <Label className="text-gray-300">{t('admin.adFrequency')}</Label>
                   <Input
                     type="number"
                     min={1}
@@ -564,10 +566,10 @@ export default function AdminDashboard() {
                     onChange={(e) => updateSetting('adFrequency', parseInt(e.target.value) || 3)}
                     className="bg-gray-800 border-gray-700 text-gray-100 mt-1.5"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Show ad every N tool uses</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('admin.adFrequencyHint')}</p>
                 </div>
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
-                  <p className="text-xs text-emerald-300">Active ad networks are tried in priority order: AdSense &rarr; Media.net &rarr; Propeller Ads</p>
+                  <p className="text-xs text-emerald-300">{t('admin.adPriority')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -579,15 +581,15 @@ export default function AdminDashboard() {
           <Card className="bg-gray-900 border-gray-800">
             <CardHeader>
               <CardTitle className="text-gray-100 flex items-center gap-2">
-                <Palette className="h-5 w-5 text-pink-400" />AdMob (Mobile App Ads)
+                <Palette className="h-5 w-5 text-pink-400" />{t('admin.admob')}
               </CardTitle>
-              <CardDescription className="text-gray-400">Google AdMob for mobile app monetization</CardDescription>
+              <CardDescription className="text-gray-400">{t('admin.admobDesc')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label className="text-gray-300">Enable AdMob</Label>
-                  <p className="text-xs text-gray-500 mt-0.5">Show AdMob mobile ads</p>
+                  <Label className="text-gray-300">{t('admin.enableAdmob')}</Label>
+                  <p className="text-xs text-gray-500 mt-0.5">{t('admin.enableAdmobDesc')}</p>
                 </div>
                 <Switch
                   checked={settings.admobEnabled}
@@ -596,7 +598,7 @@ export default function AdminDashboard() {
               </div>
               <Separator className="bg-gray-800" />
               <div>
-                <Label className="text-gray-300">AdMob App ID</Label>
+                <Label className="text-gray-300">{t('admin.admobAppId')}</Label>
                 <Input
                   value={settings.admobAppId}
                   onChange={(e) => updateSetting('admobAppId', e.target.value)}
@@ -606,7 +608,7 @@ export default function AdminDashboard() {
                 />
               </div>
               <div>
-                <Label className="text-gray-300">Banner Ad Unit ID</Label>
+                <Label className="text-gray-300">{t('admin.admobBannerId')}</Label>
                 <Input
                   value={settings.admobBannerId}
                   onChange={(e) => updateSetting('admobBannerId', e.target.value)}
@@ -616,7 +618,7 @@ export default function AdminDashboard() {
                 />
               </div>
               <div>
-                <Label className="text-gray-300">Interstitial Ad Unit ID</Label>
+                <Label className="text-gray-300">{t('admin.admobInterstitialId')}</Label>
                 <Input
                   value={settings.admobInterstitialId}
                   onChange={(e) => updateSetting('admobInterstitialId', e.target.value)}

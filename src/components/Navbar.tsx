@@ -2,18 +2,20 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sparkles, Sun, Moon, Wrench } from 'lucide-react';
+import { Menu, X, Sparkles, Sun, Moon, Wrench, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
+import { useLanguage } from '@/hooks/use-language';
+import type { TranslationKey } from '@/lib/i18n';
 
-const tools = [
-  { id: 'chat', label: 'AI Chat', icon: '💬' },
-  { id: 'image', label: 'Image Gen', icon: '🎨' },
-  { id: 'summarize', label: 'Summarize', icon: '📝' },
-  { id: 'rewrite', label: 'Rewrite', icon: '✍️' },
-  { id: 'translate', label: 'Translate', icon: '🌐' },
-  { id: 'qrcode', label: 'QR Code', icon: '📱' },
-  { id: 'shorten', label: 'URL Short', icon: '🔗' },
+const toolKeys = [
+  { id: 'chat', labelKey: 'nav.chat' as TranslationKey, icon: '💬' },
+  { id: 'image', labelKey: 'nav.image' as TranslationKey, icon: '🎨' },
+  { id: 'summarize', labelKey: 'nav.summarize' as TranslationKey, icon: '📝' },
+  { id: 'rewrite', labelKey: 'nav.rewrite' as TranslationKey, icon: '✍️' },
+  { id: 'translate', labelKey: 'nav.translate' as TranslationKey, icon: '🌐' },
+  { id: 'qrcode', labelKey: 'nav.qrcode' as TranslationKey, icon: '📱' },
+  { id: 'shorten', labelKey: 'nav.shorten' as TranslationKey, icon: '🔗' },
 ];
 
 interface NavbarProps {
@@ -27,6 +29,7 @@ interface NavbarProps {
 export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdminClick, proEnabled }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { language, setLanguage, t, isRTL } = useLanguage();
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/80 backdrop-blur-xl">
@@ -42,7 +45,7 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdm
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {tools.map((tool) => (
+            {toolKeys.map((tool) => (
               <button
                 key={tool.id}
                 onClick={() => onToolChange(tool.id)}
@@ -52,14 +55,24 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdm
                     : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
                 }`}
               >
-                <span className="mr-1">{tool.icon}</span>
-                {tool.label}
+                <span className={isRTL ? 'ml-1' : 'mr-1'}>{tool.icon}</span>
+                {t(tool.labelKey)}
               </button>
             ))}
           </div>
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Language Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+              className="text-gray-400 hover:text-emerald-400"
+              title={language === 'en' ? 'العربية' : 'English'}
+            >
+              <Languages className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -68,13 +81,12 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdm
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
-            {/* Admin button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={onAdminClick}
               className="text-gray-400 hover:text-emerald-400"
-              title="Admin Dashboard"
+              title={t('nav.admin')}
             >
               <Wrench className="h-5 w-5" />
             </Button>
@@ -84,7 +96,7 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdm
               onClick={() => onSectionClick('pricing')}
               className="hidden sm:flex text-gray-400 hover:text-gray-200"
             >
-              Pricing
+              {t('nav.pricing')}
             </Button>
             {proEnabled && (
               <Button
@@ -92,10 +104,9 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdm
                 className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium"
                 onClick={() => onSectionClick('pricing')}
               >
-                Upgrade Pro
+                {t('nav.upgradePro')}
               </Button>
             )}
-            {/* Mobile menu button */}
             <Button
               variant="ghost"
               size="icon"
@@ -118,21 +129,21 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdm
             className="md:hidden border-t border-gray-800 bg-gray-950/95 backdrop-blur-xl"
           >
             <div className="px-4 py-3 space-y-1">
-              {tools.map((tool) => (
+              {toolKeys.map((tool) => (
                 <button
                   key={tool.id}
                   onClick={() => {
                     onToolChange(tool.id);
                     setMobileMenuOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`w-full ${isRTL ? 'text-right' : 'text-left'} px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                     activeTool === tool.id
                       ? 'bg-emerald-500/20 text-emerald-400'
                       : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
                   }`}
                 >
-                  <span className="mr-2">{tool.icon}</span>
-                  {tool.label}
+                  <span className={isRTL ? 'ml-2' : 'mr-2'}>{tool.icon}</span>
+                  {t(tool.labelKey)}
                 </button>
               ))}
               <button
@@ -140,18 +151,18 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdm
                   onSectionClick('pricing');
                   setMobileMenuOpen(false);
                 }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
+                className={`w-full ${isRTL ? 'text-right' : 'text-left'} px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800/50`}
               >
-                💰 Pricing
+                💰 {t('nav.pricing')}
               </button>
               <button
                 onClick={() => {
                   onAdminClick();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-emerald-400 hover:bg-gray-800/50"
+                className={`w-full ${isRTL ? 'text-right' : 'text-left'} px-3 py-2 rounded-lg text-sm font-medium text-emerald-400 hover:bg-gray-800/50`}
               >
-                🔧 Admin Dashboard
+                🔧 {t('nav.admin')}
               </button>
             </div>
           </motion.div>

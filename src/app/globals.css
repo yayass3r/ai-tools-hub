@@ -169,3 +169,10 @@
   background-size: 200% 200%;
   animation: gradient-shift 8s ease infinite;
 }
+
+/* RTL Support */
+[dir="rtl"] .gradient-text {
+  background: linear-gradient(to left, #34d399, #5eead4, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
