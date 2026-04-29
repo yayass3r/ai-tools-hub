@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: ai-tools-hub
+    runtime: node
+    repo: https://github.com/yayass3r/ai-tools-hub
+    branch: main
+    buildCommand: bun install && bun run build
+    startCommand: bun run start
+    envVars:
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: APPWRITE_PROJECT_ID
+        value: 69f16e4400064c8d3ed4
+      - key: APPWRITE_API_ENDPOINT
+        value: https://fra.cloud.appwrite.io/v1
+      - key: APPWRITE_API_KEY
+        value: standard_1f6533d44a02b10fdabfb627d1ef58f3682b4a13265131cada6f652c646ee3016227908beff27d7290ada1ca4fea91685c985149a093049b98c822eb579fac247e8e03e124e6204fc84354333fc017aea89ccd39b53ed3b5531bd20e0586f8830c2d8f736dfabbc838b0755ef126115e61ac87125217959d9fcd47651df81ad9
+      - key: APPWRITE_DATABASE_ID
+        value: ai-tools-hub-db
+      - key: APPWRITE_USERS_COLLECTION_ID
+        value: users
+      - key: APPWRITE_USAGE_COLLECTION_ID
+        value: usage
+      - key: APPWRITE_SHORTLINKS_COLLECTION_ID
+        value: shortlinks
+    plan: free
