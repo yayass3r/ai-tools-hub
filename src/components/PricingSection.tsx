@@ -6,67 +6,72 @@ import { motion } from 'framer-motion';
 
 interface PricingSectionProps {
   onUpgrade: () => void;
+  proEnabled: boolean;
+  proPrice: string;
+  enterprisePrice: string;
+  freeDailyLimit: number;
 }
 
-const plans = [
-  {
-    name: 'Free',
-    icon: <Zap className="h-5 w-5" />,
-    price: '$0',
-    period: 'forever',
-    description: 'Perfect for trying out AI tools',
-    features: [
-      '5 uses per tool per day',
-      'All 7 AI tools',
-      'Basic response quality',
-      'Community support',
-    ],
-    cta: 'Current Plan',
-    highlighted: false,
-    color: 'gray',
-  },
-  {
-    name: 'Pro',
-    icon: <Sparkles className="h-5 w-5" />,
-    price: '$9.99',
-    period: '/month',
-    description: 'Unlimited power for professionals',
-    features: [
-      'Unlimited uses',
-      'All 7 AI tools',
-      'Priority response quality',
-      'Faster processing',
-      'Advanced image sizes',
-      'Priority support',
-      'API access',
-    ],
-    cta: 'Upgrade to Pro',
-    highlighted: true,
-    color: 'emerald',
-  },
-  {
-    name: 'Enterprise',
-    icon: <Building2 className="h-5 w-5" />,
-    price: '$49.99',
-    period: '/month',
-    description: 'For teams and organizations',
-    features: [
-      'Everything in Pro',
-      'Team collaboration',
-      'Custom AI models',
-      'Dedicated support',
-      'SLA guarantee',
-      'Custom integrations',
-      'Analytics dashboard',
-      'Admin controls',
-    ],
-    cta: 'Contact Sales',
-    highlighted: false,
-    color: 'gray',
-  },
-];
+export default function PricingSection({ onUpgrade, proEnabled, proPrice, enterprisePrice, freeDailyLimit }: PricingSectionProps) {
+  const plans = [
+    {
+      name: 'Free',
+      icon: <Zap className="h-5 w-5" />,
+      price: '$0',
+      period: 'forever',
+      description: 'Perfect for trying out AI tools',
+      features: [
+        `${freeDailyLimit} uses per tool per day`,
+        'All 7 AI tools',
+        'Basic response quality',
+        'Community support',
+      ],
+      cta: 'Current Plan',
+      highlighted: false,
+      color: 'gray',
+    },
+    {
+      name: 'Pro',
+      icon: <Sparkles className="h-5 w-5" />,
+      price: `$${proPrice}`,
+      period: '/month',
+      description: 'Unlimited power for professionals',
+      features: [
+        'Unlimited uses',
+        'All 7 AI tools',
+        'Priority response quality',
+        'Faster processing',
+        'Advanced image sizes',
+        'Priority support',
+        'API access',
+      ],
+      cta: 'Upgrade to Pro',
+      highlighted: true,
+      color: 'emerald',
+      enabled: proEnabled,
+    },
+    {
+      name: 'Enterprise',
+      icon: <Building2 className="h-5 w-5" />,
+      price: `$${enterprisePrice}`,
+      period: '/month',
+      description: 'For teams and organizations',
+      features: [
+        'Everything in Pro',
+        'Team collaboration',
+        'Custom AI models',
+        'Dedicated support',
+        'SLA guarantee',
+        'Custom integrations',
+        'Analytics dashboard',
+        'Admin controls',
+      ],
+      cta: 'Contact Sales',
+      highlighted: false,
+      color: 'gray',
+    },
+  ];
 
-export default function PricingSection({ onUpgrade }: PricingSectionProps) {
   return (
     <section id="pricing" className="py-20 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-950/10 to-transparent" />
@@ -81,12 +86,12 @@ export default function PricingSection({ onUpgrade }: PricingSectionProps) {
             Simple, Transparent Pricing
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Start free with 5 daily uses per tool. Upgrade to Pro for unlimited access and priority processing.
+            Start free with {freeDailyLimit} daily uses per tool. Upgrade to Pro for unlimited access and priority processing.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {plans.map((plan, index) => (
+        <div className={`grid gap-6 lg:gap-8 ${proEnabled ? 'md:grid-cols-3' : 'md:grid-cols-2 max-w-3xl mx-auto'}`}>
+          {plans.filter(p => p.name !== 'Pro' || proEnabled).map((plan, index) => (
             <motion.div
               key={plan.name}
               initial={{ opacity: 0, y: 30 }}

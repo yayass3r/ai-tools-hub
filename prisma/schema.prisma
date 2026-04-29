@@ -38,3 +38,31 @@ model ShortLink {
   createdAt   DateTime @default(now())
   user        User?    @relation(fields: [userId], references: [id])
 }
+
+model Settings {
+  id                  String  @id @default("global")
+  proEnabled          Boolean @default(true)
+  proPrice            String  @default("9.99")
+  enterprisePrice     String  @default("49.99")
+  freeDailyLimit      Int     @default(5)
+  adsenseEnabled      Boolean @default(false)
+  adsenseClientId     String  @default("")
+  adsenseSlotId       String  @default("")
+  adsenseAutoAds      Boolean @default(true)
+  mediaNetEnabled     Boolean @default(false)
+  mediaNetCid         String  @default("")
+  mediaNetCrid        String  @default("")
+  propellerEnabled    Boolean @default(false)
+  propellerZoneId     String  @default("")
+  admobEnabled        Boolean @default(false)
+  admobAppId          String  @default("")
+  admobBannerId       String  @default("")
+  admobInterstitialId String  @default("")
+  adPosition          String  @default("both")
+  adFrequency         Int     @default(3)
+  siteName            String  @default("AI Tools Hub")
+  siteDescription     String  @default("AI-Powered Tools at Your Fingertips")
+  maintenanceMode     Boolean @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}

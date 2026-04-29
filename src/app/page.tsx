@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
@@ -13,10 +13,13 @@ import QRCodeTool from '@/components/QRCodeTool';
 import URLShortenerTool from '@/components/URLShortenerTool';
 import PricingSection from '@/components/PricingSection';
 import Footer from '@/components/Footer';
+import AdminDashboard from '@/components/AdminDashboard';
+import AdManager from '@/components/AdManager';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Crown } from 'lucide-react';
+import { Sparkles, Crown, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSettings } from '@/hooks/use-settings';
 
 const toolComponents: Record<string, React.ReactNode> = {
   chat: <ChatTool />,
@@ -31,9 +34,17 @@ const toolComponents: Record<string, React.ReactNode> = {
 export default function Home() {
   const [activeTool, setActiveTool] = useState('');
   const [showPricingDialog, setShowPricingDialog] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const pricingRef = useRef<HTMLDivElement>(null);
+  const { settings, loading } = useSettings();
 
   const handleToolChange = (tool: string) => {
+    if (tool === 'admin') {
+      setShowAdmin(true);
+      setActiveTool('');
+      return;
+    }
+    setShowAdmin(false);
     setActiveTool(tool);
     setTimeout(() => {
       document.getElementById('tools-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -54,8 +65,38 @@ export default function Home() {
   };
 
   const handleUpgrade = () => {
+    if (!settings.proEnabled) {
+      toast.info('Pro plan is currently unavailable.');
+      return;
+    }
     setShowPricingDialog(true);
   };
+
+  // Maintenance mode
+  if (!loading && settings.maintenanceMode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-100">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md mx-auto px-4"
+        >
+          <div className="mx-auto w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center mb-6">
+            <AlertTriangle className="h-10 w-10 text-amber-400" />
+          </div>
+          <h1 className="text-3xl font-bold mb-3">Under Maintenance</h1>
+          <p className="text-gray-400 mb-6">We are currently performing maintenance on {settings.siteName}. Please check back soon.</p>
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
+            className="border-gray-700 text-gray-300 hover:bg-gray-800"
+          >
+            Refresh Page
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-gray-100">
@@ -63,69 +104,93 @@ export default function Home() {
         activeTool={activeTool}
         onToolChange={handleToolChange}
         onSectionClick={handleSectionClick}
+        onAdminClick={() => handleToolChange('admin')}
+        proEnabled={settings.proEnabled}
       />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <HeroSection onGetStarted={handleGetStarted} onViewPricing={() => handleSectionClick('pricing')} />
+        {showAdmin ? (
+          <section className="py-8">
+            <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+              <AdminDashboard />
+            </div>
+          </section>
+        ) : (
+          <>
+            {/* Top Ad */}
+            <AdManager position="top" className="mx-auto max-w-4xl px-4 pt-4" />
 
-        {/* Tools Section */}
-        <section id="tools-section" className="py-16 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/50 to-transparent" />
-          <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <AnimatePresence mode="wait">
-              {activeTool ? (
-                <motion.div
-                  key={activeTool}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {toolComponents[activeTool]}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="tool-grid"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                >
-                  {[
-                    { id: 'chat', icon: '💬', title: 'AI Chat', desc: 'Conversational AI assistant' },
-                    { id: 'image', icon: '🎨', title: 'Image Generator', desc: 'Create images from text prompts' },
-                    { id: 'summarize', icon: '📝', title: 'Summarizer', desc: 'Condense long text into key points' },
-                    { id: 'rewrite', icon: '✍️', title: 'Text Rewriter', desc: 'Rewrite in different styles' },
-                    { id: 'translate', icon: '🌐', title: 'Translator', desc: 'Translate between 15+ languages' },
-                    { id: 'qrcode', icon: '📱', title: 'QR Code', desc: 'Generate QR codes instantly' },
-                    { id: 'shorten', icon: '🔗', title: 'URL Shortener', desc: 'Shorten URLs with analytics' },
-                  ].map((tool, index) => (
-                    <motion.button
-                      key={tool.id}
+            {/* Hero Section */}
+            <HeroSection onGetStarted={handleGetStarted} onViewPricing={() => handleSectionClick('pricing')} />
+
+            {/* Tools Section */}
+            <section id="tools-section" className="py-16 relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/50 to-transparent" />
+              <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                <AnimatePresence mode="wait">
+                  {activeTool ? (
+                    <motion.div
+                      key={activeTool}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.08 }}
-                      onClick={() => handleToolChange(tool.id)}
-                      className="group p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/30 hover:bg-gray-800/80 text-left transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5"
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      <div className="text-3xl mb-3">{tool.icon}</div>
-                      <h3 className="text-lg font-semibold text-gray-100 group-hover:text-emerald-400 transition-colors">
-                        {tool.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 mt-1">{tool.desc}</p>
-                    </motion.button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </section>
+                      {toolComponents[activeTool]}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="tool-grid"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                    >
+                      {[
+                        { id: 'chat', icon: '💬', title: 'AI Chat', desc: 'Conversational AI assistant' },
+                        { id: 'image', icon: '🎨', title: 'Image Generator', desc: 'Create images from text prompts' },
+                        { id: 'summarize', icon: '📝', title: 'Summarizer', desc: 'Condense long text into key points' },
+                        { id: 'rewrite', icon: '✍️', title: 'Text Rewriter', desc: 'Rewrite in different styles' },
+                        { id: 'translate', icon: '🌐', title: 'Translator', desc: 'Translate between 15+ languages' },
+                        { id: 'qrcode', icon: '📱', title: 'QR Code', desc: 'Generate QR codes instantly' },
+                        { id: 'shorten', icon: '🔗', title: 'URL Shortener', desc: 'Shorten URLs with analytics' },
+                      ].map((tool, index) => (
+                        <motion.button
+                          key={tool.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.08 }}
+                          onClick={() => handleToolChange(tool.id)}
+                          className="group p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-emerald-500/30 hover:bg-gray-800/80 text-left transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5"
+                        >
+                          <div className="text-3xl mb-3">{tool.icon}</div>
+                          <h3 className="text-lg font-semibold text-gray-100 group-hover:text-emerald-400 transition-colors">
+                            {tool.title}
+                          </h3>
+                          <p className="text-sm text-gray-500 mt-1">{tool.desc}</p>
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </section>
 
-        {/* Pricing Section */}
-        <div ref={pricingRef}>
-          <PricingSection onUpgrade={handleUpgrade} />
-        </div>
+            {/* Pricing Section */}
+            <div ref={pricingRef}>
+              <PricingSection
+                onUpgrade={handleUpgrade}
+                proEnabled={settings.proEnabled}
+                proPrice={settings.proPrice}
+                enterprisePrice={settings.enterprisePrice}
+                freeDailyLimit={settings.freeDailyLimit}
+              />
+            </div>
+
+            {/* Bottom Ad */}
+            <AdManager position="bottom" className="mx-auto max-w-4xl px-4 pb-4" />
+          </>
+        )}
       </main>
 
       <Footer />
@@ -152,7 +217,7 @@ export default function Home() {
               ))}
             </div>
             <div className="text-center">
-              <span className="text-3xl font-bold text-gray-100">$9.99</span>
+              <span className="text-3xl font-bold text-gray-100">${settings.proPrice}</span>
               <span className="text-gray-500">/month</span>
             </div>
             <Button

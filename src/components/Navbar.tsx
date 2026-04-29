@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sparkles, Sun, Moon, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 
@@ -20,9 +20,11 @@ interface NavbarProps {
   activeTool: string;
   onToolChange: (tool: string) => void;
   onSectionClick: (section: string) => void;
+  onAdminClick: () => void;
+  proEnabled: boolean;
 }
 
-export default function Navbar({ activeTool, onToolChange, onSectionClick }: NavbarProps) {
+export default function Navbar({ activeTool, onToolChange, onSectionClick, onAdminClick, proEnabled }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -66,6 +68,16 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick }: Nav
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
+            {/* Admin button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onAdminClick}
+              className="text-gray-400 hover:text-emerald-400"
+              title="Admin Dashboard"
+            >
+              <Wrench className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -74,14 +86,15 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick }: Nav
             >
               Pricing
             </Button>
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium"
-              onClick={() => onSectionClick('pricing')}
-            >
-              Upgrade Pro
-            </Button>
-
+            {proEnabled && (
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium"
+                onClick={() => onSectionClick('pricing')}
+              >
+                Upgrade Pro
+              </Button>
+            )}
             {/* Mobile menu button */}
             <Button
               variant="ghost"
@@ -130,6 +143,15 @@ export default function Navbar({ activeTool, onToolChange, onSectionClick }: Nav
                 className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
               >
                 💰 Pricing
+              </button>
+              <button
+                onClick={() => {
+                  onAdminClick();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-emerald-400 hover:bg-gray-800/50"
+              >
+                🔧 Admin Dashboard
               </button>
             </div>
           </motion.div>
